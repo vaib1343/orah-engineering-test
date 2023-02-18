@@ -1,26 +1,26 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useContext } from "react"
 import styled from "styled-components"
 import Button from "@material-ui/core/ButtonBase"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faArrowUp, faArrowDown } from '@fortawesome/free-solid-svg-icons'
 import { Spacing, BorderRadius, FontWeight } from "shared/styles/styles"
 import { Colors } from "shared/styles/colors"
 import { CenteredContainer } from "shared/components/centered-container/centered-container.component"
-import { Person } from "shared/models/person"
-import { useApi } from "shared/hooks/use-api"
 import { StudentListTile } from "staff-app/components/student-list-tile/student-list-tile.component"
 import { ActiveRollOverlay, ActiveRollAction } from "staff-app/components/active-roll-overlay/active-roll-overlay.component"
+import { StudentContext } from "shared/context/student-context"
+import Toggle from "react-toggle"
+import { IconProp } from "@fortawesome/fontawesome-svg-core"
 
 export const HomeBoardPage: React.FC = () => {
   const [isRollMode, setIsRollMode] = useState(false)
-  const [getStudents, data, loadState] = useApi<{ students: Person[] }>({ url: "get-homeboard-students" })
+  const { data, loadState, handleSort } = useContext(StudentContext)
 
-  useEffect(() => {
-    void getStudents()
-  }, [getStudents])
-
-  const onToolbarAction = (action: ToolbarAction) => {
+  const onToolbarAction = (action: ToolbarAction, value?: string) => {
     if (action === "roll") {
       setIsRollMode(true)
+    } else if (action === 'sort') {
+      handleSort()
     }
   }
 
@@ -65,11 +65,18 @@ interface ToolbarProps {
   onItemClick: (action: ToolbarAction, value?: string) => void
 }
 const Toolbar: React.FC<ToolbarProps> = (props) => {
-  const { onItemClick } = props
+  const { onItemClick } = props;
+  const { sortBy, sortType, onSortBy, handleFilter } = useContext(StudentContext)
+
   return (
     <S.ToolbarContainer>
-      <div onClick={() => onItemClick("sort")}>First Name</div>
-      <div>Search</div>
+      <div onClick={() => onItemClick("sort")}>
+        <span>Name</span>
+        {sortType === 'ascending' && <FontAwesomeIcon icon={faArrowUp} />}
+        {sortType === 'descending' && <FontAwesomeIcon icon={faArrowDown} />}
+      </div>
+      <Toggle icons={false} checked={sortBy == 'first_name'} onChange={() => onSortBy()} />
+      <div><input onChange={(e) => handleFilter(e.target.value)}/></div>
       <S.Button onClick={() => onItemClick("roll")}>Start Roll</S.Button>
     </S.ToolbarContainer>
   )
