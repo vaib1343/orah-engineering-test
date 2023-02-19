@@ -1,8 +1,9 @@
-import React from "react"
+import React, { useContext } from "react"
 import styled from "styled-components"
 import Button from "@material-ui/core/Button"
 import { BorderRadius, Spacing } from "shared/styles/styles"
 import { RollStateList } from "staff-app/components/roll-state/roll-state-list.component"
+import { StudentContext } from "shared/context/student-context"
 
 export type ActiveRollAction = "filter" | "exit"
 interface Props {
@@ -12,6 +13,7 @@ interface Props {
 
 export const ActiveRollOverlay: React.FC<Props> = (props) => {
   const { isActive, onItemClick } = props
+  const {studentStatusCount} = useContext(StudentContext)
 
   return (
     <S.Overlay isActive={isActive}>
@@ -20,10 +22,10 @@ export const ActiveRollOverlay: React.FC<Props> = (props) => {
         <div>
           <RollStateList
             stateList={[
-              { type: "all", count: 0 },
-              { type: "present", count: 0 },
-              { type: "late", count: 0 },
-              { type: "absent", count: 0 },
+              { type: "all", count: studentStatusCount?.all},
+              { type: "present", count: studentStatusCount?.present },
+              { type: "late", count: studentStatusCount?.late },
+              { type: "absent", count: studentStatusCount?.absent },
             ]}
           />
           <div style={{ marginTop: Spacing.u6 }}>

@@ -10,7 +10,6 @@ import { StudentListTile } from "staff-app/components/student-list-tile/student-
 import { ActiveRollOverlay, ActiveRollAction } from "staff-app/components/active-roll-overlay/active-roll-overlay.component"
 import { StudentContext } from "shared/context/student-context"
 import Toggle from "react-toggle"
-import { IconProp } from "@fortawesome/fontawesome-svg-core"
 
 export const HomeBoardPage: React.FC = () => {
   const [isRollMode, setIsRollMode] = useState(false)
