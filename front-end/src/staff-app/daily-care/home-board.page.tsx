@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useContext } from "react"
+import Toggle from "react-toggle"
+import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 import Button from "@material-ui/core/ButtonBase"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
@@ -9,11 +11,13 @@ import { CenteredContainer } from "shared/components/centered-container/centered
 import { StudentListTile } from "staff-app/components/student-list-tile/student-list-tile.component"
 import { ActiveRollOverlay, ActiveRollAction } from "staff-app/components/active-roll-overlay/active-roll-overlay.component"
 import { StudentContext } from "shared/context/student-context"
-import Toggle from "react-toggle"
+import { useApi } from "shared/hooks/use-api"
 
 export const HomeBoardPage: React.FC = () => {
   const [isRollMode, setIsRollMode] = useState(false)
   const { data, loadState, handleSort } = useContext(StudentContext)
+  const navigate = useNavigate()
+  const [saveActiveRoll] = useApi({ url: "save-roll" })
 
   const onToolbarAction = (action: ToolbarAction, value?: string) => {
     if (action === "roll") {
@@ -23,8 +27,12 @@ export const HomeBoardPage: React.FC = () => {
     }
   }
 
-  const onActiveRollAction = (action: ActiveRollAction) => {
+  const onActiveRollAction = async (action: ActiveRollAction) => {
     if (action === "exit") {
+      setIsRollMode(false)
+    } else if (action === "activity") {
+      await saveActiveRoll(data)
+      navigate("/staff/activity")
       setIsRollMode(false)
     }
   }
@@ -75,7 +83,7 @@ const Toolbar: React.FC<ToolbarProps> = (props) => {
         {sortType === 'descending' && <FontAwesomeIcon icon={faArrowDown} />}
       </div>
       <Toggle icons={false} checked={sortBy == 'first_name'} onChange={() => onSortBy()} />
-      <div><input onChange={(e) => handleFilter(e.target.value)}/></div>
+      <div><input onChange={(e) => handleFilter(e.target.value)} /></div>
       <S.Button onClick={() => onItemClick("roll")}>Start Roll</S.Button>
     </S.ToolbarContainer>
   )
